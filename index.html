@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Growth Fitness</title>
+  <style>
+    :root{
+      --bg:#000000; --bg2:#0a0a0a;
+      --panel:#1a1a1a; --card:#121212; --border:#333333;
+      --text:#ffffff; --muted:#bbbbbb;
+      --accent:#d9f542; --accent2:#e5ff7a; --chip:#2a2a2a;
+      --danger:#ef4444;
+      --column-bg:#2b2b2b;
+      --btn:#d9f542;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;overflow:hidden}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,var(--bg),var(--bg2) 60%,var(--bg));
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+    }
+
+    .app{display:flex;flex-direction:column;height:100%}
+
+    header{
+      position:sticky;top:0;z-index:10;
+      display:flex;align-items:center;gap:12px;
+      padding:16px 20px;
+      background:rgba(20,20,20,.9);
+      border-bottom:1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-badge{width:28px;height:28px;border-radius:8px;background:var(--btn)}
+    .brand-title{font-size:18px;line-height:1;margin:0}
+    .spacer{flex:1}
+
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+    button,input,select,.file-input-label{
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      padding:10px 12px;
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+
+    button{cursor:pointer}
+    button.primary{background:var(--btn);color:#000;border:1px solid var(--border)}
+    button.ghost{background:transparent}
+    button:disabled{opacity:.6;cursor:not-allowed}
+
+    input[type="search"]{min-width:260px}
+
+    /* Kebab menu */
+    .menu{position:relative}
+    .menu-btn{width:42px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1}
+    .menu-panel{
+      position:absolute;right:0;top:48px;
+      min-width:220px;
+      background:#141414;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:8px;
+      box-shadow:0 16px 40px rgba(0,0,0,.5);
+      display:none;
+      z-index:30;
+    }
+    .menu-panel button, .menu-panel label{
+      width:100%;
+      display:flex;
+      justify-content:flex-start;
+      gap:10px;
+      align-items:center;
+      background:transparent;
+      border:1px solid transparent;
+      padding:10px 10px;
+      border-radius:10px;
+      font-weight:700;
+      cursor:pointer;
+      color:var(--text);
+    }
+    .menu-panel button:hover, .menu-panel label:hover{border-color:#2a2a2a;background:#101010}
+    .file-input{display:none}
+
+    .kanban{
+      display:flex;
+      flex:1;
+      gap:16px;
+      padding:20px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scrollbar-width:thin;
+      scrollbar-color: var(--accent) #121212;
+    }
+
+    .kanban::-webkit-scrollbar{height:10px}
+    .kanban::-webkit-scrollbar-track{background:#121212;border-radius:10px}
+    .kanban::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px}
+
+    .column{
+      width:280px;
+      min-width:280px;
+      flex:0 0 280px;
+      background:var(--column-bg);
+      border:1px solid var(--border);
+      border-radius:16px;
+      display:flex;
+      flex-direction:column;
+      max-height:calc(100% - 40px);
+    }
+
+    .col-header{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:12px;
+      border-bottom:1px solid var(--border);
+      user-select:none;
+      cursor:grab;
+    }
+    .col-header:active{cursor:grabbing}
+
+    .col-dot{width:10px;height:10px;border-radius:50%;cursor:pointer}
+    .col-title{font-weight:800;font-size:14px;cursor:text}
+    .col-count{margin-left:auto;color:var(--muted);font-size:12px}
+
+    .col-actions{display:flex;align-items:center;gap:6px;margin-left:6px}
+
+    .col-btn{
+      width:28px;height:28px;
+      border-radius:10px;
+      border:1px solid transparent;
+      background:transparent;
+      color:var(--muted);
+      cursor:pointer;
+      display:inline-flex;align-items:center;justify-content:center;
+      font-weight:900;line-height:1;
+      padding:0;
+    }
+    .col-btn:hover{border-color:rgba(255,255,255,.08);color:var(--text)}
+    .col-btn.danger:hover{border-color:rgba(239,68,68,.25);color:#fca5a5}
+
+    .dropzone{padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px;
+      cursor:grab;
+      box-shadow:0 4px 14px rgba(0,0,0,.22);
+      transition:transform .08s ease;
+      color:var(--text);
+      min-width:0;
+      width:100%;
+    }
+    .card:active{cursor:grabbing;transform:scale(.99)}
+    .card:hover{border-color:#444}
+
+    .card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+    .name{font-weight:900;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+    .card-info{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .phone-pill{
+      display:inline-flex;
+      align-items:center;
+      width:fit-content;
+      max-width:100%;
+      padding:4px 10px;
+      border-radius:999px;
+      background:rgba(217,245,66,.95);
+      border:1px solid rgba(217,245,66,.35);
+      color:#000;
+      font-weight:900;
+      letter-spacing:.3px;
+      font-size:12px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .card.placeholder{
+      border:2px dashed rgba(217,245,66,.6);
+      background:rgba(217,245,66,.08);
+      min-height:54px;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:6px;
+      max-width:100%;
+      min-width:0;
+      align-content:flex-start;
+    }
+    .chip{
+      background:var(--chip);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:999px;
+      padding:3px 8px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.3px;
+      max-width:100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      flex:0 1 auto;
+      min-width:0;
+      color:var(--text);
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .chip.action{
+      background:rgba(217,245,66,.95);
+      border-color:rgba(217,245,66,.35);
+      color:#000;
+    }
+
+    .footer{padding:10px 12px}
+
+    .add-lead-btn{
+      width:100%;
+      background:var(--btn);
+      border:1px solid var(--border);
+      color:#000;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .add-lead-btn:hover{filter:brightness(1.1)}
+
+    .highlight{outline:2px dashed var(--accent2);outline-offset:-6px}
+
+    /* DASHBOARD */
+    #dashboard{
+      display:none;
+      flex:1;
+      overflow:auto;
+      padding:20px;
+    }
+
+    .dash-wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+
+    .metrics-2rows{display:flex;flex-direction:column;gap:12px}
+    .metrics-row{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px}
+
+    .metric-card{background:#101010;border:1px solid var(--border);border-radius:16px;padding:14px}
+    .metric-card h3{margin:0;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.2px}
+    .metric-value{margin-top:10px;font-size:26px;font-weight:900}
+
+    .metric-input{
+      margin-top:10px;
+      width:100%;
+      background:#0f0f0f;
+      border:1px solid #2a2a2a;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .panel{background:#101010;border:1px solid var(--border);border-radius:16px;padding:14px}
+    .panel h4{margin:0 0 12px 0;font-size:12px;color:var(--muted);font-weight:900;letter-spacing:.2px}
+
+    .funnel{display:flex;flex-direction:column;gap:10px}
+    .funnel-row{background:#111;border:1px solid #333;border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .funnel-left{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .funnel-name{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .funnel-sub{color:var(--muted);font-size:12px}
+    .funnel-right{font-weight:900;color:var(--accent)}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(7,10,24,.66);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal{width:min(920px,94vw);max-height:88vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.4);color:var(--text)}
+    .modal header{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--border);padding:12px 20px;font-weight:800;cursor:default}
+    .modal .body{padding:16px 20px;display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    .group{display:flex;flex-direction:column;gap:6px}
+    label{font-size:12px;color:var(--muted)}
+    .modal input, .modal textarea, .modal select{background:#1a1a1a;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;width:100%}
+    .modal textarea{min-height:100px}
+    .modal footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--border)}
+    .btn-danger{background:linear-gradient(135deg,var(--danger),#f87171);border:1px solid rgba(255,255,255,.08)}
+
+    .tags-editor{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .colors{display:flex;gap:6px}
+    .color{width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,255,255,.2);cursor:pointer}
+
+    .timeline{background:#1a1a1a;border:1px solid var(--border);border-radius:12px;padding:12px;font-size:12px}
+    .timeline h4{margin:0 0 10px 0;font-size:12px;color:var(--muted)}
+    .timeline ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+    .timeline li{display:flex;gap:8px;color:var(--text)}
+    .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;background:var(--accent)}
+
+    @media (max-width: 1100px){
+      .metrics-row{grid-template-columns:repeat(2,minmax(160px,1fr))}
+      input[type="search"]{min-width:180px}
+    }
+    @media (max-width: 980px){
+      .modal .body{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header>
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true"></div>
+        <h1 class="brand-title">Growth Fitness</h1>
+      </div>
+      <div class="spacer"></div>
+
+      <input id="q" type="search" placeholder="Buscar por nome, tag..." />
+
+      <div class="toolbar">
+        <button type="button" class="primary" id="newLeadBtn">+ Novo Lead</button>
+        <button type="button" id="newStageBtn">+ Coluna</button>
+        <button class="ghost" id="btnPipeline">Pipeline</button>
+        <button class="ghost" id="btnDashboard">Dashboard</button>
+
+        <div class="menu" id="moreMenu">
+          <button class="ghost menu-btn" id="moreBtn" title="Mais">⋯</button>
+          <div class="menu-panel" id="morePanel" aria-hidden="true">
+            <button type="button" id="exportJsonBtn">Exportar JSON</button>
+            <input id="importJsonFile" type="file" accept="application/json" class="file-input" />
+            <label for="importJsonFile">Importar JSON</label>
+
+            <button type="button" id="exportCsvBtn">Exportar CSV</button>
+            <input id="importCsvFile" type="file" accept="text/csv" class="file-input" />
+            <label for="importCsvFile">Importar CSV</label>
+
+            <button type="button" id="templateCsvBtn">Modelo CSV</button>
+          </div>
+        </div>
+
+        <button class="ghost" id="resetBtn" style="color:#fca5a5;border-color:#432024">Reset</button>
+      </div>
+    </header>
+
+    <main class="kanban" id="kanban"></main>
+
+    <section id="dashboard">
+      <div class="dash-wrap">
+        <div class="metrics-2rows">
+          <div class="metrics-row" id="metricsRow1">
+            <div class="metric-card"><h3 id="h_lead">Lead</h3><div id="m_lead" class="metric-value">0</div></div>
+            <div class="metric-card"><h3 id="h_ag">Agendado</h3><div id="m_ag" class="metric-value">0</div></div>
+            <div class="metric-card"><h3 id="h_exp">Experimental</h3><div id="m_exp" class="metric-value">0</div></div>
+            <div class="metric-card"><h3 id="h_mat">Matriculado</h3><div id="m_mat" class="metric-value">0</div></div>
+          </div>
+
+          <div class="metrics-row" id="metricsRow2">
+            <div class="metric-card">
+              <h3>Investimento em Tráfego</h3>
+              <input id="trafficInput" class="metric-input" inputmode="decimal" placeholder="R$ 0,00" />
+            </div>
+            <div class="metric-card"><h3>Receita</h3><div id="m_rev" class="metric-value">R$ 0,00</div></div>
+            <div class="metric-card"><h3>CAC</h3><div id="m_cac" class="metric-value">R$ 0,00</div></div>
+            <div class="metric-card"><h3>ROI</h3><div id="m_roi" class="metric-value">R$ 0,00</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4>Conversão entre etapas</h4>
+          <div id="funnel" class="funnel"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal de Lead (VERSÃO COMPLETA) -->
+  <div class="modal-backdrop" id="leadModalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal" id="leadModal">
+      <header>Lead</header>
+      <div class="body">
+        <section>
+          <div class="group">
+            <label>Nome</label>
+            <input id="f_name" type="text" placeholder="Ex.: Ana Souza" />
+          </div>
+
+          <div class="group" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label>Email</label>
+              <input id="f_email" type="email" placeholder="ana@email.com" />
+            </div>
+            <div>
+              <label>Telefone</label>
+              <input id="f_phone" type="tel" placeholder="(11) 9 9999-9999" />
+            </div>
+          </div>
+
+          <div class="group" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label>Valor (R$)</label>
+              <input id="f_value" type="number" min="0" step="0.01" />
+            </div>
+            <div>
+              <label>Origem</label>
+              <input id="f_source" type="text" placeholder="Anuncio, Indicacao, Organico..." />
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Ação (próximo passo)</label>
+            <input id="f_action" type="text" placeholder="Ex.: Confirmar visita / Enviar proposta / Follow-up" />
+          </div>
+
+          <div class="group">
+            <label>Notas</label>
+            <textarea id="f_notes" placeholder="Contexto, proximos passos..."></textarea>
+          </div>
+
+          <div class="group">
+            <label>Etiquetas</label>
+            <div class="tags-editor">
+              <input id="tagInput" type="text" placeholder="Digite e pressione Enter" style="flex:1" />
+              <div class="colors" id="colorPalette"></div>
+            </div>
+            <div class="chips" id="tagChips" style="margin-top:8px"></div>
+          </div>
+
+          <div class="group" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div>
+              <label>Responsavel</label>
+              <input id="f_owner" type="text" placeholder="Ex.: Joana" />
+            </div>
+            <div>
+              <label>Status de pagamento</label>
+              <select id="f_payment">
+                <option value="Pendente">Pendente</option>
+                <option value="Pago">Pago</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+            </div>
+            <div>
+              <label>Proximo contato</label>
+              <input id="f_next" type="datetime-local" />
+            </div>
+          </div>
+        </section>
+
+        <aside>
+          <div class="timeline">
+            <h4>Jornada do Lead</h4>
+            <ul id="timeline"></ul>
+          </div>
+        </aside>
+      </div>
+
+      <footer>
+        <button id="deleteLeadBtn" class="btn-danger">Excluir</button>
+        <div class="spacer"></div>
+        <button id="closeLeadBtn" class="ghost">Cancelar</button>
+        <button id="saveLeadBtn" class="primary">Salvar</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+  "use strict";
+
+  // ===== Util =====
+  function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+  function uid(){ return Math.random().toString(36).slice(2,9); }
+  function nowISO(){ return new Date().toISOString(); }
+  function tint(hex,alpha){
+    var c=String(hex||"#3b82f6").replace("#","");
+    var r=parseInt(c.slice(0,2),16)||59;
+    var g=parseInt(c.slice(2,4),16)||130;
+    var b=parseInt(c.slice(4,6),16)||246;
+    return "rgba("+r+","+g+","+b+","+alpha+")";
+  }
+  function fmtBRL(n){
+    try{ return Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+    catch(e){ return "R$ 0,00"; }
+  }
+
+  function parseNumber(str){
+    var s=String(str||"").trim();
+    if(!s) return 0;
+    // aceita "R$ 1.234,56" / "1234,56" / "1234.56"
+    s=s.replace(/R\$\s?/g,"").replace(/\./g,"").replace(/,/g,".");
+    var n=Number(s);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function safeNum(v, fallback){
+    var n=Number(v);
+    return isNaN(n) ? (fallback||0) : n;
+  }
+
+  function nextOrder(stageId){
+    var max=0;
+    (state.leads||[]).forEach(function(l){
+      if(l.stageId===stageId){
+        var o=safeNum(l.order,0);
+        if(o>max) max=o;
+      }
+    });
+    return max+1;
+  }
+
+  function normalizeStageOrders(stageId){
+    var items=(state.leads||[]).filter(function(l){ return l.stageId===stageId; })
+      .sort(function(a,b){
+        var ao=safeNum(a.order,0), bo=safeNum(b.order,0);
+        if(ao!==bo) return ao-bo;
+        return String(a.updatedAt||a.createdAt).localeCompare(String(b.updatedAt||b.createdAt));
+      });
+    items.forEach(function(l,i){ l.order=i+1; });
+  }
+
+  function normalizeAllOrders(){
+    (state.stages||[]).forEach(function(s){ normalizeStageOrders(s.id); });
+  }
+
+  // Placeholder de drag dentro da coluna
+  var draggingLeadId=null;
+  var dragPlaceholder=null;
+
+  function ensurePlaceholder(){
+    if(dragPlaceholder) return dragPlaceholder;
+    var ph=document.createElement("div");
+    ph.className="card placeholder";
+    ph.setAttribute("aria-hidden","true");
+    dragPlaceholder=ph;
+    return ph;
+  }
+
+  function cleanupPlaceholder(){
+    if(dragPlaceholder && dragPlaceholder.parentNode) dragPlaceholder.parentNode.removeChild(dragPlaceholder);
+    dragPlaceholder=null;
+  }
+
+  function getDragAfterElement(container, y){
+    var cards=[].slice.call(container.querySelectorAll(".card:not(.placeholder)"));
+    var closest={offset:Number.NEGATIVE_INFINITY, element:null};
+    cards.forEach(function(child){
+      var id=child.dataset.leadId;
+      if(id && id===draggingLeadId) return;
+      var box=child.getBoundingClientRect();
+      var offset=y - (box.top + box.height/2);
+      if(offset<0 && offset>closest.offset){
+        closest={offset:offset, element:child};
+      }
+    });
+    return closest.element;
+  }
+
+  // ===== Storage =====
+  var STORAGE_KEY="kanbanGFv4";
+  var TRAFFIC_KEY="kanbanGFv4_traffic";
+
+  // ===== Estado =====
+  var defaultState={
+    stages:[
+      {id:"stage-lead",name:"Lead",color:"#d9f542"},
+      {id:"stage-ag",name:"Agendado",color:"#f59e0b"},
+      {id:"stage-exp",name:"Experimental",color:"#3b82f6"},
+      {id:"stage-mat",name:"Matriculado",color:"#22c55e"}
+    ],
+    leads:[]
+  };
+
+  var state = load();
+  // garante uma ordem consistente para drag & drop dentro da coluna
+  normalizeAllOrders();
+  save();
+
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  function load(){
+    try{
+      var raw=localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var parsed=JSON.parse(raw);
+        if(parsed && Array.isArray(parsed.stages) && Array.isArray(parsed.leads)) return sanitizeState(parsed);
+      }
+    }catch(e){ console.warn("Falha ao ler storage",e); }
+    return deepClone(defaultState);
+  }
+
+  function sanitizeState(s){
+    var next={ stages:[], leads:[] };
+
+    next.stages=(s.stages||[]).filter(Boolean).map(function(st){
+      return {
+        id:String(st.id||uid()),
+        name:String(st.name||"Etapa"),
+        color:String(st.color||"#d9f542")
+      };
+    });
+    if(!next.stages.length) next.stages=deepClone(defaultState.stages);
+
+    var stageSet=new Set(next.stages.map(function(x){ return x.id; }));
+
+    next.leads=(s.leads||[]).filter(Boolean).map(function(l){
+      var tags=[];
+      if(Array.isArray(l.tags)){
+        tags=l.tags.map(function(t){
+          return { text:String((t&&t.text)||""), color:String((t&&t.color)||"#3b82f6") };
+        }).filter(function(t){ return t.text.trim(); });
+      }
+
+      var history=[];
+      if(Array.isArray(l.history)){
+        history=l.history.map(function(h){
+          return { ts:String((h&&h.ts)||nowISO()), action:String((h&&h.action)||"Atualizacao") };
+        });
+      }else{
+        history=[{ts:nowISO(),action:"Criado"}];
+      }
+
+      var stageId=String(l.stageId||next.stages[0].id);
+      if(!stageSet.has(stageId)) stageId=next.stages[0].id;
+
+      return {
+        id:String(l.id||uid()),
+        name:String(l.name||""),
+        email:String(l.email||""),
+        phone:String(l.phone||""),
+        value:(l.value===0 || l.value) ? l.value : "",
+        source:String(l.source||""),
+        actionText:String(l.actionText||l.action||""),
+        notes:String(l.notes||""),
+        tags:tags,
+        owner:String(l.owner||""),
+        paymentStatus:String(l.paymentStatus||"Pendente"),
+        nextContact:String(l.nextContact||""),
+        stageId:stageId,
+        createdAt:String(l.createdAt||nowISO()),
+        updatedAt:String(l.updatedAt||l.createdAt||nowISO()),
+        history:history,
+        order: safeNum(l.order, 0)
+      };
+    });
+
+    return next;
+  }
+
+  // ===== DOM =====
+  var kanbanEl=document.getElementById("kanban");
+  var dashboardEl=document.getElementById("dashboard");
+  var searchInput=document.getElementById("q");
+
+  var btnPipeline=document.getElementById("btnPipeline");
+  var btnDashboard=document.getElementById("btnDashboard");
+  var newLeadBtn=document.getElementById("newLeadBtn");
+  var newStageBtn=document.getElementById("newStageBtn");
+  var resetBtn=document.getElementById("resetBtn");
+
+  // Kebab
+  var moreBtn=document.getElementById("moreBtn");
+  var morePanel=document.getElementById("morePanel");
+  var exportJsonBtn=document.getElementById("exportJsonBtn");
+  var importJsonFile=document.getElementById("importJsonFile");
+  var exportCsvBtn=document.getElementById("exportCsvBtn");
+  var importCsvFile=document.getElementById("importCsvFile");
+  var templateCsvBtn=document.getElementById("templateCsvBtn");
+
+  // Dashboard main
+  var hLead=document.getElementById("h_lead");
+  var hAg=document.getElementById("h_ag");
+  var hExp=document.getElementById("h_exp");
+  var hMat=document.getElementById("h_mat");
+
+  var mLead=document.getElementById("m_lead");
+  var mAg=document.getElementById("m_ag");
+  var mExp=document.getElementById("m_exp");
+  var mMat=document.getElementById("m_mat");
+
+  var mRev=document.getElementById("m_rev");
+  var mCac=document.getElementById("m_cac");
+  var mRoi=document.getElementById("m_roi");
+  var funnelEl=document.getElementById("funnel");
+  var trafficInput=document.getElementById("trafficInput");
+
+  // Modal
+  var modalBackdrop=document.getElementById("leadModalBackdrop");
+  var f={
+    name:document.getElementById("f_name"),
+    email:document.getElementById("f_email"),
+    phone:document.getElementById("f_phone"),
+    value:document.getElementById("f_value"),
+    source:document.getElementById("f_source"),
+    action:document.getElementById("f_action"),
+    notes:document.getElementById("f_notes"),
+    tagInput:document.getElementById("tagInput"),
+    tagChips:document.getElementById("tagChips"),
+    colorPalette:document.getElementById("colorPalette"),
+    timeline:document.getElementById("timeline"),
+    owner:document.getElementById("f_owner"),
+    payment:document.getElementById("f_payment"),
+    next:document.getElementById("f_next")
+  };
+
+  var currentLeadId=null;
+  var draftTags=[];
+  var palette=["#22c55e","#ef4444","#f59e0b","#3b82f6","#a855f7","#06b6d4","#eab308","#84cc16","#fb7185","#14b8a6"];
+
+  // ===== View toggles =====
+  function showPipeline(){
+    dashboardEl.style.display="none";
+    kanbanEl.style.display="flex";
+  }
+  function showDashboard(){
+    kanbanEl.style.display="none";
+    dashboardEl.style.display="block";
+    renderDashboard();
+  }
+
+  btnPipeline.addEventListener("click",showPipeline);
+  btnDashboard.addEventListener("click",showDashboard);
+
+  // ===== Menu =====
+  function closeMenu(){
+    morePanel.style.display="none";
+    morePanel.setAttribute("aria-hidden","true");
+  }
+  function toggleMenu(){
+    var open = morePanel.style.display === "block";
+    if(open) closeMenu();
+    else {
+      morePanel.style.display="block";
+      morePanel.setAttribute("aria-hidden","false");
+    }
+  }
+  moreBtn.addEventListener("click",function(e){
+    e.stopPropagation();
+    toggleMenu();
+  });
+  document.addEventListener("click",function(){ closeMenu(); });
+  morePanel.addEventListener("click",function(e){ e.stopPropagation(); });
+
+  // ===== Render Kanban =====
+  function filterLead(l,q){
+    if(!q) return true;
+    var hay=[l.name,l.email,l.phone,l.actionText,(l.tags||[]).map(function(t){return t.text;}).join(" ")].join(" ").toLowerCase();
+    return hay.indexOf(q)>-1;
+  }
+
+  function render(){
+    kanbanEl.innerHTML="";
+    var q=(searchInput.value||"").toLowerCase();
+
+    if(!state.stages || !state.stages.length) state.stages=deepClone(defaultState.stages);
+
+    state.stages.forEach(function(stage){
+      var col=document.createElement("section");
+      col.className="column";
+      col.dataset.stageId=stage.id;
+
+      // header
+      var header=document.createElement("div");
+      header.className="col-header";
+      header.draggable=true;
+      header.dataset.stageId=stage.id;
+
+      header.addEventListener("dragstart",function(e){
+        e.dataTransfer.setData("text/stage",stage.id);
+      });
+      header.addEventListener("dragover",function(e){ e.preventDefault(); });
+      header.addEventListener("drop",function(e){
+        e.preventDefault();
+        var fromId=e.dataTransfer.getData("text/stage");
+        if(fromId) reorderStage(fromId, stage.id);
+      });
+
+      var dot=document.createElement("span");
+      dot.className="col-dot";
+      dot.style.background=stage.color;
+      dot.title="Clique para alterar a cor";
+      dot.addEventListener("click",function(){
+        var c=prompt("Cor (hex) ex: #22c55e", stage.color);
+        if(!c) return;
+        stage.color=c.trim();
+        save();
+        render();
+      });
+
+      var title=document.createElement("div");
+      title.className="col-title";
+      title.textContent=stage.name;
+      title.title="Duplo clique para renomear";
+      title.addEventListener("dblclick",function(){ renameStage(stage.id); });
+
+      var count=document.createElement("div");
+      count.className="col-count";
+      var inStage=state.leads.filter(function(l){ return l.stageId===stage.id; });
+      count.textContent=inStage.length+" lead"+(inStage.length!==1?"s":"");
+
+      var actions=document.createElement("div");
+      actions.className="col-actions";
+
+      var btnEdit=document.createElement("button");
+      btnEdit.className="col-btn";
+      btnEdit.type="button";
+      btnEdit.textContent="E";
+      btnEdit.title="Renomear";
+      btnEdit.addEventListener("click",function(){ renameStage(stage.id); });
+
+      var btnDel=document.createElement("button");
+      btnDel.className="col-btn danger";
+      btnDel.type="button";
+      btnDel.textContent="X";
+      btnDel.title="Remover coluna";
+      btnDel.addEventListener("click",function(){ removeStage(stage.id); });
+
+      actions.appendChild(btnEdit);
+      actions.appendChild(btnDel);
+
+      header.appendChild(dot);
+      header.appendChild(title);
+      header.appendChild(count);
+      header.appendChild(actions);
+
+      // dropzone
+      var dz=document.createElement("div");
+      dz.className="dropzone";
+      dz.dataset.stageId=stage.id;
+
+      dz.addEventListener("dragover",function(e){
+        e.preventDefault();
+        dz.classList.add("highlight");
+
+        // reordenar dentro da mesma coluna (placeholder)
+        if(draggingLeadId){
+          var ph=ensurePlaceholder();
+          var after=getDragAfterElement(dz, e.clientY);
+          if(after==null) dz.appendChild(ph);
+          else dz.insertBefore(ph, after);
+        }
+      });
+
+      dz.addEventListener("dragleave",function(e){
+        // só remove highlight se o mouse saiu do container de verdade
+        if(!dz.contains(e.relatedTarget)) dz.classList.remove("highlight");
+      });
+
+      dz.addEventListener("drop",function(e){
+        e.preventDefault();
+        dz.classList.remove("highlight");
+
+        var id=e.dataTransfer.getData("text/lead") || draggingLeadId;
+        if(!id) return;
+
+        var beforeId=null;
+        if(dragPlaceholder && dragPlaceholder.parentNode===dz){
+          var next=dragPlaceholder.nextElementSibling;
+          beforeId = next && next.dataset ? next.dataset.leadId : null;
+        }
+        cleanupPlaceholder();
+        reorderLead(id, stage.id, beforeId);
+      });
+
+      inStage
+        .filter(function(l){ return filterLead(l,q); })
+        .sort(function(a,b){
+          var ao=safeNum(a.order,0), bo=safeNum(b.order,0);
+          if(ao!==bo) return ao-bo;
+          return String(a.updatedAt||a.createdAt).localeCompare(String(b.updatedAt||b.createdAt));
+        })
+        .forEach(function(l){ dz.appendChild(leadCard(l)); });
+
+      // footer
+      var footer=document.createElement("div");
+      footer.className="footer";
+      var addBtn=document.createElement("button");
+      addBtn.className="add-lead-btn";
+      addBtn.type="button";
+      addBtn.textContent="+ Adicionar Lead";
+      addBtn.addEventListener("click",function(){
+        var created = addLead({stageId:stage.id});
+        openLeadModal(created.id);
+      });
+      footer.appendChild(addBtn);
+
+      col.appendChild(header);
+      col.appendChild(dz);
+      col.appendChild(footer);
+      kanbanEl.appendChild(col);
+    });
+
+    if(dashboardEl.style.display!=="none") renderDashboard();
+  }
+
+  function leadCard(l){
+    var el=document.createElement("article");
+    el.className="card";
+    el.draggable=true;
+    el.dataset.leadId=l.id;
+
+    el.addEventListener("dragstart",function(e){
+      draggingLeadId=l.id;
+      e.dataTransfer.setData("text/lead", l.id);
+      // efeito visual
+      setTimeout(function(){ el.style.opacity="0.35"; }, 0);
+    });
+
+    el.addEventListener("dragend",function(){
+      el.style.opacity="";
+      draggingLeadId=null;
+      cleanupPlaceholder();
+      // remove highlights
+      [].slice.call(document.querySelectorAll(".dropzone.highlight")).forEach(function(z){ z.classList.remove("highlight"); });
+    });
+
+    el.addEventListener("click",function(){ openLeadModal(l.id); });
+
+    var info=document.createElement("div");
+    info.className="card-info";
+
+    var top=document.createElement("div");
+    top.className="card-top";
+
+    var name=document.createElement("div");
+    name.className="name";
+    name.textContent=l.name || "Sem nome";
+
+    top.appendChild(name);
+    info.appendChild(top);
+
+    // telefone abaixo do nome (se existir)
+    var phoneTxt=String(l.phone||"").trim();
+    if(phoneTxt){
+      var phone=document.createElement("div");
+      phone.className="phone-pill";
+      phone.textContent=phoneTxt;
+      info.appendChild(phone);
+    }
+
+    var chips=document.createElement("div");
+    chips.className="chips";
+
+    if(l.actionText && String(l.actionText).trim()){
+      var actionChip=document.createElement("span");
+      actionChip.className="chip action";
+      actionChip.textContent=String(l.actionText).trim();
+      chips.appendChild(actionChip);
+    }
+
+    (l.tags||[]).forEach(function(t){
+      var chip=document.createElement("span");
+      chip.className="chip";
+      chip.textContent=t.text;
+      chip.style.background=tint(t.color,.12);
+      chip.style.borderColor=tint(t.color,.30);
+      chip.style.color=t.color;
+      chips.appendChild(chip);
+    });
+
+    el.appendChild(info);
+    if(chips.childNodes.length) el.appendChild(chips);
+    return el;
+  }
+
+  // ===== Acoes =====
+  function addLead(base){
+    base=base||{};
+    var l={
+      id:uid(),
+      name:base.name||"Novo lead",
+      email:"",
+      phone:"",
+      value:"",
+      source:"",
+      actionText:"",
+      notes:"",
+      tags:[],
+      owner:"",
+      paymentStatus:"Pendente",
+      nextContact:"",
+      stageId: base.stageId || state.stages[0].id,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+      history:[{ts:nowISO(),action:"Criado"}],
+      order: nextOrder(base.stageId || state.stages[0].id)
+    };
+    state.leads.push(l);
+    save();
+    render();
+    return l;
+  }
+
+  function moveLeadTo(id,stageId){
+    var l=state.leads.find(function(x){ return x.id===id; });
+    if(!l) return;
+
+    var fromStageId=l.stageId;
+    if(l.stageId!==stageId){
+      var from=(state.stages.find(function(s){return s.id===l.stageId;})||{}).name||"-";
+      var to=(state.stages.find(function(s){return s.id===stageId;})||{}).name||"-";
+      (l.history||(l.history=[])).push({ts:nowISO(),action:"Movido: "+from+" -> "+to});
+      l.stageId=stageId;
+      l.order=nextOrder(stageId);
+      normalizeStageOrders(fromStageId);
+      normalizeStageOrders(stageId);
+    }
+
+    l.updatedAt=nowISO();
+    save();
+    render();
+  }
+
+  // Reordenar dentro da coluna (e também permite "encaixar" embaixo)
+  function reorderLead(id, stageId, beforeId){
+    var l=state.leads.find(function(x){ return x.id===id; });
+    if(!l) return;
+
+    var fromStageId=l.stageId;
+    var stageChanged = (fromStageId!==stageId);
+
+    if(stageChanged){
+      var from=(state.stages.find(function(s){return s.id===fromStageId;})||{}).name||"-";
+      var to=(state.stages.find(function(s){return s.id===stageId;})||{}).name||"-";
+      (l.history||(l.history=[])).push({ts:nowISO(),action:"Movido: "+from+" -> "+to});
+      l.stageId=stageId;
+    }
+
+    // lista ordenada atual (sem o item)
+    var list=(state.leads||[])
+      .filter(function(x){ return x.stageId===stageId && x.id!==id; })
+      .sort(function(a,b){ return safeNum(a.order,0)-safeNum(b.order,0); });
+
+    var idx=beforeId ? list.findIndex(function(x){ return x.id===beforeId; }) : -1;
+    if(idx<0) list.push(l);
+    else list.splice(idx,0,l);
+
+    // aplica ordem sequencial
+    list.forEach(function(item,i){ item.order=i+1; });
+
+    // se saiu de uma coluna, normaliza a coluna antiga também
+    if(stageChanged) normalizeStageOrders(fromStageId);
+
+    l.updatedAt=nowISO();
+    save();
+    render();
+  }
+
+  function addStage(){
+    var name=prompt("Nome da nova coluna:");
+    if(!name) return;
+    var color=prompt("Cor (hex) ex: #22c55e", "#d9f542") || "#d9f542";
+    state.stages.push({id:uid(),name:name.trim(),color:color.trim()});
+    save();
+    render();
+  }
+
+  function renameStage(stageId){
+    var st=state.stages.find(function(s){ return s.id===stageId; });
+    if(!st) return;
+    var name=prompt("Novo nome da etapa:", st.name);
+    if(!name) return;
+    st.name=name.trim();
+    save();
+    render();
+  }
+
+  function removeStage(stageId){
+    if(state.stages.length<=1){ alert("Voce precisa ter pelo menos 1 coluna."); return; }
+
+    var st=state.stages.find(function(s){ return s.id===stageId; });
+    var nm=st?st.name:"";
+
+    // sem quebra de linha literal (evita 'Invalid token')
+    var msg="Remover a coluna '"+nm+"'?\\n\\nLeads dessa coluna vao para a primeira coluna.";
+    if(!confirm(msg)) return;
+
+    var firstId=state.stages[0].id;
+    state.leads.forEach(function(l){ if(l.stageId===stageId) l.stageId=firstId; });
+    state.stages=state.stages.filter(function(s){ return s.id!==stageId; });
+    save();
+    render();
+  }
+
+  function reorderStage(fromId,toId){
+    if(fromId===toId) return;
+    var fromIdx=state.stages.findIndex(function(s){ return s.id===fromId; });
+    var toIdx=state.stages.findIndex(function(s){ return s.id===toId; });
+    if(fromIdx<0 || toIdx<0) return;
+    var item=state.stages.splice(fromIdx,1)[0];
+    state.stages.splice(toIdx,0,item);
+    save();
+    render();
+  }
+
+  function resetAll(){
+    if(confirm("Limpar tudo e voltar ao padrao?")){
+      state=deepClone(defaultState);
+      save();
+      render();
+      showPipeline();
+    }
+  }
+
+  // ===== Modal, Etiquetas, Timeline =====
+  function renderTagsEditor(){
+    f.tagChips.innerHTML="";
+    draftTags.forEach(function(t,i){
+      var chip=document.createElement("span");
+      chip.className="chip";
+      chip.textContent=t.text;
+      chip.style.background=tint(t.color,.12);
+      chip.style.borderColor=tint(t.color,.30);
+      chip.style.color=t.color;
+      chip.style.userSelect="none";
+      chip.title="Clique para remover";
+      chip.addEventListener("click",function(){
+        draftTags.splice(i,1);
+        renderTagsEditor();
+      });
+      f.tagChips.appendChild(chip);
+    });
+
+    f.colorPalette.innerHTML="";
+    palette.forEach(function(c){
+      var sw=document.createElement("button");
+      sw.type="button";
+      sw.className="color";
+      sw.style.background=c;
+      sw.title=c;
+      sw.addEventListener("click",function(){ addTagWithColor(c); });
+      f.colorPalette.appendChild(sw);
+    });
+  }
+
+  function addTagWithColor(color){
+    var text=(f.tagInput.value||"").trim();
+    if(!text) return;
+    draftTags.push({text:text,color:color});
+    f.tagInput.value="";
+    renderTagsEditor();
+  }
+
+  f.tagInput.addEventListener("keydown",function(e){
+    if(e.key==="Enter"){
+      e.preventDefault();
+      addTagWithColor(palette[0]);
+    }
+  });
+
+  function renderTimeline(l){
+    f.timeline.innerHTML="";
+    (l.history||[]).slice().reverse().forEach(function(h){
+      var li=document.createElement("li");
+      var dot=document.createElement("span");
+      dot.className="dot";
+      var msg=document.createElement("div");
+      var dt=new Date(h.ts);
+      msg.innerHTML="<strong>"+dt.toLocaleString("pt-BR")+"</strong> - "+(h.action||"Atualizacao");
+      li.appendChild(dot);
+      li.appendChild(msg);
+      f.timeline.appendChild(li);
+    });
+  }
+
+  function openLeadModal(id){
+    currentLeadId=id;
+    var l=state.leads.find(function(x){ return x.id===id; });
+    if(!l) return;
+
+    f.name.value=l.name||"";
+    f.email.value=l.email||"";
+    f.phone.value=l.phone||"";
+    f.value.value=(l.value===0 || l.value) ? l.value : "";
+    f.source.value=l.source||"";
+    f.action.value=l.actionText||"";
+    f.notes.value=l.notes||"";
+    f.owner.value=l.owner||"";
+    f.payment.value=l.paymentStatus||"Pendente";
+    f.next.value=l.nextContact||"";
+
+    draftTags=(l.tags||[]).slice();
+    renderTagsEditor();
+    renderTimeline(l);
+
+    modalBackdrop.style.display="flex";
+  }
+
+  function closeLeadModal(){ modalBackdrop.style.display="none"; }
+
+  document.getElementById("closeLeadBtn").addEventListener("click",closeLeadModal);
+
+  document.getElementById("saveLeadBtn").addEventListener("click",function(){
+    var l=state.leads.find(function(x){ return x.id===currentLeadId; });
+    if(!l) return;
+
+    l.name=(f.name.value||"").trim()||"Sem nome";
+    l.email=(f.email.value||"").trim();
+    l.phone=(f.phone.value||"").trim();
+    l.value=(f.value.value!=="" && f.value.value!=null) ? Number(f.value.value) : "";
+    l.source=(f.source.value||"").trim();
+    l.actionText=(f.action.value||"").trim();
+    l.notes=(f.notes.value||"").trim();
+    l.tags=draftTags.slice();
+    l.owner=(f.owner.value||"").trim();
+    l.paymentStatus=f.payment.value;
+    l.nextContact=f.next.value;
+
+    (l.history||(l.history=[])).push({ts:nowISO(),action:"Editado"});
+    l.updatedAt=nowISO();
+
+    save();
+    render();
+    closeLeadModal();
+  });
+
+  document.getElementById("deleteLeadBtn").addEventListener("click",function(){
+    if(!currentLeadId) return;
+    if(confirm("Excluir este lead?")){
+      state.leads=state.leads.filter(function(x){ return x.id!==currentLeadId; });
+      save();
+      render();
+      closeLeadModal();
+    }
+  });
+
+  modalBackdrop.addEventListener("click",function(e){
+    if(e.target===modalBackdrop) closeLeadModal();
+  });
+
+  document.addEventListener("keydown",function(e){
+    if(e.key==="Escape" && modalBackdrop.style.display==="flex") closeLeadModal();
+  });
+
+  // ===== Dashboard (somente 4 principais por ID; nomes refletem renome) =====
+  function getStageById(id){
+    return (state.stages||[]).find(function(s){ return s.id===id; }) || null;
+  }
+
+  function renderDashboard(){
+    var sLead=getStageById("stage-lead");
+    var sAg=getStageById("stage-ag");
+    var sExp=getStageById("stage-exp");
+    var sMat=getStageById("stage-mat");
+
+    // se alguém deletou as 4 principais, faz fallback seguro
+    var ids = {
+      lead: sLead ? sLead.id : (state.stages[0] ? state.stages[0].id : null),
+      ag: sAg ? sAg.id : null,
+      exp: sExp ? sExp.id : null,
+      mat: sMat ? sMat.id : null
+    };
+
+    // labels (se renomear no pipeline, muda aqui)
+    if(hLead) hLead.textContent = sLead ? sLead.name : "Lead";
+    if(hAg) hAg.textContent = sAg ? sAg.name : "Agendado";
+    if(hExp) hExp.textContent = sExp ? sExp.name : "Experimental";
+    if(hMat) hMat.textContent = sMat ? sMat.name : "Matriculado";
+
+    var counts={lead:0,ag:0,exp:0,mat:0};
+    state.leads.forEach(function(l){
+      if(ids.lead && l.stageId===ids.lead) counts.lead++;
+      if(ids.ag && l.stageId===ids.ag) counts.ag++;
+      if(ids.exp && l.stageId===ids.exp) counts.exp++;
+      if(ids.mat && l.stageId===ids.mat) counts.mat++;
+    });
+
+    mLead.textContent=String(counts.lead);
+    mAg.textContent=String(counts.ag);
+    mExp.textContent=String(counts.exp);
+    mMat.textContent=String(counts.mat);
+
+    // Receita = soma de valores dos leads em Matriculado (se existir)
+    var rev=0;
+    if(ids.mat){
+      state.leads.forEach(function(l){
+        if(l.stageId===ids.mat){
+          var v=Number(l.value||0);
+          if(!isNaN(v)) rev+=v;
+        }
+      });
+    }
+    mRev.textContent=fmtBRL(rev);
+
+    // Tráfego, CAC, ROI
+    var traffic = parseNumber(localStorage.getItem(TRAFFIC_KEY) || "0");
+    var matCount = counts.mat || 0;
+    var cac = matCount>0 ? (traffic / matCount) : 0;
+    var roi = rev - traffic;
+
+    mCac.textContent=fmtBRL(cac);
+    mRoi.textContent=fmtBRL(roi);
+
+    // funil visual = sempre 4 principais se existirem; se não, usa estágios atuais
+    funnelEl.innerHTML="";
+
+    var stagesToShow=[];
+    if(sLead && sAg && sExp && sMat){
+      stagesToShow=[sLead,sAg,sExp,sMat];
+    } else {
+      stagesToShow=(state.stages||[]).slice(0,4);
+    }
+
+    var countsArr=stagesToShow.map(function(s){
+      return state.leads.filter(function(l){ return l.stageId===s.id; }).length;
+    });
+
+    stagesToShow.forEach(function(s,i){
+      var qty=countsArr[i]||0;
+      var conv=(i===0) ? null : (countsArr[i-1] ? (qty/countsArr[i-1]) : 0);
+      var perc=(i===0) ? "Base" : String(Math.round(conv*100))+"%";
+
+      var row=document.createElement("div");
+      row.className="funnel-row";
+
+      var left=document.createElement("div");
+      left.className="funnel-left";
+
+      var nm=document.createElement("div");
+      nm.className="funnel-name";
+      nm.textContent=s.name;
+
+      var sub=document.createElement("div");
+      sub.className="funnel-sub";
+      sub.textContent=String(qty)+" lead(s)";
+
+      left.appendChild(nm);
+      left.appendChild(sub);
+
+      var right=document.createElement("div");
+      right.className="funnel-right";
+      right.textContent=perc;
+
+      row.appendChild(left);
+      row.appendChild(right);
+      funnelEl.appendChild(row);
+    });
+  }
+
+  // ===== Traffic input (persistente) =====
+  function syncTrafficUI(){
+    var v=localStorage.getItem(TRAFFIC_KEY);
+    var n=parseNumber(v||"0");
+    trafficInput.value = n ? fmtBRL(n) : "";
+  }
+
+  function commitTraffic(){
+    var n=parseNumber(trafficInput.value);
+    localStorage.setItem(TRAFFIC_KEY, String(n));
+    trafficInput.value = n ? fmtBRL(n) : "";
+    renderDashboard();
+  }
+
+  trafficInput.addEventListener("blur", commitTraffic);
+  trafficInput.addEventListener("keydown", function(e){
+    if(e.key==="Enter"){
+      e.preventDefault();
+      commitTraffic();
+      trafficInput.blur();
+    }
+  });
+
+  // ===== Import/Export JSON =====
+  exportJsonBtn.addEventListener("click",function(){
+    closeMenu();
+    var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="growth-fitness-kanban-"+new Date().toISOString().slice(0,10)+".json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  importJsonFile.addEventListener("change",function(e){
+    closeMenu();
+    var file=e.target.files && e.target.files[0];
+    if(!file) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var data=JSON.parse(String(r.result||""));
+        if(!data.stages || !data.leads) throw new Error("JSON invalido");
+        state=sanitizeState(data);
+        normalizeAllOrders();
+        save();
+        render();
+        alert("Importado com sucesso!");
+      }catch(err){
+        alert("Erro ao importar: "+err.message);
+      }
+    };
+    r.readAsText(file);
+    e.target.value="";
+  });
+
+  // ===== CSV helpers =====
+  function csvEscape(v){
+    var s=String(v==null?"":v);
+    if(/[",\n\r]/.test(s)) s='"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }
+
+  function toCsv(){
+    var headers=["id","name","email","phone","value","source","actionText","notes","tags","owner","paymentStatus","nextContact","stageId","createdAt","updatedAt","order"];
+    var lines=[headers.join(",")];
+    (state.leads||[]).forEach(function(l){
+      var tags=(l.tags||[]).map(function(t){ return (t.text||"")+"|"+(t.color||""); }).join(";");
+      var row=[
+        l.id,l.name,l.email,l.phone,l.value,l.source,l.actionText,l.notes,
+        tags,l.owner,l.paymentStatus,l.nextContact,l.stageId,l.createdAt,l.updatedAt,l.order
+      ].map(csvEscape).join(",");
+      lines.push(row);
+    });
+    return lines.join("\n");
+  }
+
+  function parseCsv(textCsv){
+    var lines=String(textCsv||"").split(/\r?\n/).filter(function(x){ return x.trim(); });
+    if(lines.length<2) throw new Error("CSV vazio");
+    var headers=lines[0].split(",").map(function(h){ return h.trim(); });
+
+    function parseLine(line){
+      var out=[];
+      var cur="", inQ=false;
+      for(var i=0;i<line.length;i++){
+        var ch=line[i];
+        if(inQ){
+          if(ch === '"' && line[i+1] === '"'){ cur+='"'; i++; }
+          else if(ch === '"'){ inQ=false; }
+          else cur+=ch;
+        } else {
+          if(ch === '"') inQ=true;
+          else if(ch === ','){ out.push(cur); cur=""; }
+          else cur+=ch;
+        }
+      }
+      out.push(cur);
+      return out;
+    }
+
+    var leads=[];
+    for(var li=1; li<lines.length; li++){
+      var cells=parseLine(lines[li]);
+      var obj={};
+      headers.forEach(function(h,idx){ obj[h]=cells[idx]; });
+
+      var tags=[];
+      if(obj.tags){
+        String(obj.tags).split(";").filter(Boolean).forEach(function(pair){
+          var parts=pair.split("|");
+          var t=String(parts[0]||"").trim();
+          var c=String(parts[1]||"#3b82f6").trim();
+          if(t) tags.push({text:t,color:c});
+        });
+      }
+
+      leads.push({
+        id:obj.id || uid(),
+        name:obj.name || "",
+        email:obj.email || "",
+        phone:obj.phone || "",
+        value:(obj.value!=="" && obj.value!=null) ? Number(obj.value) : "",
+        source:obj.source || "",
+        actionText:obj.actionText || "",
+        notes:obj.notes || "",
+        tags:tags,
+        owner:obj.owner || "",
+        paymentStatus:obj.paymentStatus || "Pendente",
+        nextContact:obj.nextContact || "",
+        stageId:obj.stageId || "stage-lead",
+        createdAt:obj.createdAt || nowISO(),
+        updatedAt:obj.updatedAt || obj.createdAt || nowISO(),
+        history:[{ts:nowISO(),action:"Importado CSV"}],
+        order: safeNum(obj.order, 0)
+      });
+    }
+    return leads;
+  }
+
+  exportCsvBtn.addEventListener("click",function(){
+    closeMenu();
+    var blob=new Blob([toCsv()],{type:"text/csv;charset=utf-8"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="growth-fitness-kanban-"+new Date().toISOString().slice(0,10)+".csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  importCsvFile.addEventListener("change",function(e){
+    closeMenu();
+    var file=e.target.files && e.target.files[0];
+    if(!file) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var leads=parseCsv(String(r.result||""));
+        state.leads=leads;
+        state=sanitizeState(state);
+        normalizeAllOrders();
+        save();
+        render();
+        alert("CSV importado com sucesso!");
+      }catch(err){
+        alert("Erro ao importar CSV: "+err.message);
+      }
+    };
+    r.readAsText(file);
+    e.target.value="";
+  });
+
+  templateCsvBtn.addEventListener("click",function(){
+    closeMenu();
+    var sample="id,name,email,phone,value,source,actionText,notes,tags,owner,paymentStatus,nextContact,stageId,createdAt,updatedAt,order\n" +
+      "123,Ana Souza,ana@email.com,(11) 99999-9999,200,Indicação,Follow-up,Primeiro contato,VIP|#22c55e;Indicacao|#3b82f6,Joana,Pendente,,stage-lead,"+nowISO()+","+nowISO()+",1\n";
+    var blob=new Blob([sample],{type:"text/csv;charset=utf-8"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="modelo-growth-fitness.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // ===== Controles =====
+  newLeadBtn.addEventListener("click",function(){
+    openLeadModal(addLead({}).id);
+  });
+
+  newStageBtn.addEventListener("click",addStage);
+  resetBtn.addEventListener("click",resetAll);
+  searchInput.addEventListener("input",render);
+
+  // ===== Start =====
+  syncTrafficUI();
+  showPipeline();
+  render();
+
+  </script>
+</body>
+</html>
